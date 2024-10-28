@@ -58,10 +58,9 @@ void effect(){
 local light_shader = g.newShader([[#pragma language glsl3
 varying vec2 w_p;
 #ifdef VERTEX
-attribute vec2 world_pos;
 vec4 position( mat4 transform_projection, vec4 vertex_position ){
 	vec4 pos = vertex_position;
-	w_p = world_pos;
+	w_p = VertexTexCoord.xy;
 	pos.xy *= love_ScreenSize.xy;
 	return ProjectionMatrix * pos;
 }
@@ -188,9 +187,9 @@ local function newOcclusionMesh(max_edges)
 	return setmetatable({mesh = mesh, edge_count = 0}, occlusion_mesh_api)
 end
 
-local fs_mesh = g.newMesh(occlusion_mesh_vf, {{0,0},{2,0},{0,2}}, nil, "static")
-local world_pos = g.newMesh({{"world_pos", "float", 2}},3,nil,"dynamic")
-fs_mesh:attachAttribute("world_pos", world_pos)
+local fs_mesh = g.newMesh(occlusion_mesh_vf, {{0,0},{2,0},{0,2}}, "fan", "static")
+local world_pos = g.newMesh({{"VertexTexCoord", "float", 2}},3,"fan","dynamic")
+fs_mesh:attachAttribute("VertexTexCoord", world_pos)
 
 local light_transform = function(x,y, r,g,b,a)
 	r, g = tmp_transform:transformPoint(r,g)
